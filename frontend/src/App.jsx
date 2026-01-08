@@ -1,22 +1,23 @@
-import { useState } from 'react'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/common/Navbar';
+import Landing from './pages/Landing';
+import Dashboard from './pages/Dashboard';
+import Management from './pages/Management';
 
 function App() {
     return (
-        <div className="app">
-            <header className="header">
-                <h1>Stock Dashboard</h1>
-                <p>Real-time Stock Market Data & Analytics</p>
-            </header>
-
-            <main className="main">
-                <div className="container">
-                    <h2>Setup Complete!</h2>
-                    <p>Backend API: <code>{import.meta.env.VITE_API_URL}</code></p>
-                    <p>Ready to build amazing features!</p>
-                </div>
-            </main>
-        </div>
-    )
+        <Router>
+            <div className="App">
+                <Navbar />
+                <Routes>
+                    <Route path="/" element={<Landing />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/manage" element={<Management />} />
+                </Routes>
+            </div>
+        </Router>
+    );
 }
 
-export default App
+export default App;
