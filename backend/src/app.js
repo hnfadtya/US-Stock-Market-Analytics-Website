@@ -5,9 +5,9 @@ require('dotenv').config();
 const { PORT } = require('./config/constants');
 const errorHandler = require('./middleware/errorHandler');
 
-// TODO: Import routes
-// const stockRoutes = require('./routes/stockRoutes');
-// const syncRoutes = require('./routes/syncRoutes');
+// Routes
+const stockRoutes = require('./routes/stockRoutes');
+const syncRoutes = require('./routes/syncRoutes');
 
 const app = express();
 
@@ -25,9 +25,9 @@ app.get('/health', (req, res) => {
     });
 });
 
-// TODO: Create API Routes
-// app.use('/api/stocks', stockRoutes);
-// app.use('/api/sync', syncRoutes);
+// API Routes
+app.use('/api/stocks', stockRoutes);
+app.use('/api/sync', syncRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
