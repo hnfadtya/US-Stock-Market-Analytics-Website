@@ -13,13 +13,13 @@ const { validatePagination } = require('../utils/validators');
  */
 async function triggerSync(req, res, next) {
   try {
-    console.log('📡 Manual sync triggered by user');
+    console.log('Manual sync triggered by user');
 
     // Check if initial sync is needed
     const needsInitial = await stockService.needsInitialSync();
 
     if (needsInitial) {
-      console.log('🚀 Database is empty, running initial sync...');
+      console.log('Database is empty, running initial sync...');
       const result = await stockService.initialSync();
       return res.json(result);
     }
@@ -101,7 +101,7 @@ async function getSyncStats(req, res, next) {
  */
 async function triggerInitialSync(req, res, next) {
   try {
-    console.log('🚀 Manual initial sync triggered');
+    console.log('Manual initial sync triggered');
     const result = await stockService.initialSync();
     res.json(result);
   } catch (error) {
