@@ -75,13 +75,15 @@ async function getHistoricalEOD(symbol, fromDate, toDate) {
         const endpoint = `/historical-price-eod/full?symbol=${symbol}&from=${from}&to=${to}&apikey=${FMP_API_KEY}`;
         const data = await fetchFromFMP(endpoint);
         
-        if (!data || !data.historical) {
+        if (!data || !Array.isArray(data) || data.length === 0) {
             console.warn(`No historical data found for ${symbol}`);
             return [];
         }
 
+        console.log(`Fetched ${data.length} records for ${symbol}`);
+
         // Transform FMP data to valid format
-        return data.historical.map(record => ({
+        return data.map(record => ({
             symbol: symbol,
             date: record.date,
             open: record.open,
