@@ -38,7 +38,7 @@ async function getCompanyProfile(symbol) {
     try {
         const endpoint = `/profile?symbol=${symbol}&apikey=${FMP_API_KEY}`;
         const data = await fetchFromFMP(endpoint);
-        
+
         if (!data || data.length === 0) {
             throw new Error(`No profile data found for ${symbol}`);
         }
@@ -75,16 +75,17 @@ async function getHistoricalEOD(symbol, fromDate, toDate) {
         const endpoint = `/historical-price-eod/full?symbol=${symbol}&from=${from}&to=${to}&apikey=${FMP_API_KEY}`;
         const data = await fetchFromFMP(endpoint);
         
+        // FMP returns direct array for this endpoint
         if (!data || !Array.isArray(data) || data.length === 0) {
             console.warn(`No historical data found for ${symbol}`);
             return [];
         }
 
-        console.log(`Fetched ${data.length} records for ${symbol}`);
+        console.log(`✅ Fetched ${data.length} records for ${symbol}`);
 
-        // Transform FMP data to valid format
+        // Transform FMP data to our format
         return data.map(record => ({
-            symbol: symbol,
+            symbol: record.symbol,
             date: record.date,
             open: record.open,
             high: record.high,
@@ -107,16 +108,17 @@ async function getHistoricalEOD(symbol, fromDate, toDate) {
  */
 async function getBatchQuote(symbols) {
     try {
+        // This will try batch endpoint first (premium feature)
         const symbolsParam = symbols.join(',');
         const endpoint = `/batch-quote?symbols=${symbolsParam}&apikey=${FMP_API_KEY}`;
         const data = await fetchFromFMP(endpoint);
-
+        
         if (!data || data.length === 0) {
-            console.warn('No quote data returned');
+            console.warn('No quote data returned from batch endpoint');
             return [];
         }
 
-        // Transform quote data to valid format
+        // Transform quote data to our format
         return data.map(quote => ({
             symbol: quote.symbol,
             open: quote.open,
@@ -130,9 +132,29 @@ async function getBatchQuote(symbols) {
         }));
     } catch (error) {
         console.error('Error fetching batch quote:', error.message);
+        
+        // Fallback: If batch fails (402 Payment Required), use individual calls
+        if (error.message.includes('402') || error.message.includes('Payment Required')) {
+            console.log('Batch quote failed (premium feature), falling back to individual calls...');
+            
+            const quotes = [];
+            for (const symbol of symbols) {
+                try {
+                    const quote = await getSingleQuote(symbol);
+                    quotes.push(quote);
+                    // Small delay to avoid rate limiting
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                } catch (err) {
+                    console.error(`Failed to fetch quote for ${symbol}:`, err.message);
+                }
+            }
+
+            return quotes;
+        }
+
         throw error;
     }
-}   
+}
 
 /**
  * Get single stock quote
@@ -143,7 +165,7 @@ async function getSingleQuote(symbol) {
     try {
         const endpoint = `/quote?symbol=${symbol}&apikey=${FMP_API_KEY}`;
         const data = await fetchFromFMP(endpoint);
-
+        
         if (!data || data.length === 0) {
             throw new Error(`No quote data found for ${symbol}`);
         }
@@ -165,7 +187,7 @@ async function getSingleQuote(symbol) {
         console.error(`Error fetching quote for ${symbol}:`, error.message);
         throw error;
     }
-}   
+}
 
 module.exports = {
     getCompanyProfile,
