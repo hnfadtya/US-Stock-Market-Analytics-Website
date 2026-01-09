@@ -11,12 +11,18 @@
 export const formatCurrency = (value, currency = 'USD') => {
     if (value === null || value === undefined) return '-';
     
+    // Convert to number if string
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
+    
+    // Check if valid number
+    if (isNaN(numValue)) return '-';
+    
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: currency,
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-    }).format(value);
+    }).format(numValue);
 };
 
 /**
@@ -27,7 +33,13 @@ export const formatCurrency = (value, currency = 'USD') => {
 export const formatNumber = (value) => {
     if (value === null || value === undefined) return '-';
     
-    return new Intl.NumberFormat('en-US').format(value);
+    // Convert to number if string
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
+    
+    // Check if valid number
+    if (isNaN(numValue)) return '-';
+    
+    return new Intl.NumberFormat('en-US').format(numValue);
 };
 
 /**
@@ -38,15 +50,21 @@ export const formatNumber = (value) => {
 export const formatVolume = (value) => {
     if (value === null || value === undefined) return '-';
     
-    if (value >= 1_000_000_000) {
-        return `${(value / 1_000_000_000).toFixed(2)}B`;
-    } else if (value >= 1_000_000) {
-        return `${(value / 1_000_000).toFixed(2)}M`;
-    } else if (value >= 1_000) {
-        return `${(value / 1_000).toFixed(2)}K`;
+    // Convert to number if string
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
+    
+    // Check if valid number
+    if (isNaN(numValue)) return '-';
+    
+    if (numValue >= 1_000_000_000) {
+        return `${(numValue / 1_000_000_000).toFixed(2)}B`;
+    } else if (numValue >= 1_000_000) {
+        return `${(numValue / 1_000_000).toFixed(2)}M`;
+    } else if (numValue >= 1_000) {
+        return `${(numValue / 1_000).toFixed(2)}K`;
     }
 
-    return value.toString();
+    return numValue.toString();
 };
 
 /**
@@ -57,8 +75,14 @@ export const formatVolume = (value) => {
 export const formatPercent = (value) => {
     if (value === null || value === undefined) return '-';
     
-    const sign = value > 0 ? '+' : '';
-    return `${sign}${value.toFixed(2)}%`;
+    // Convert to number if string
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
+    
+    // Check if valid number
+    if (isNaN(numValue)) return '-';
+    
+    const sign = numValue > 0 ? '+' : '';
+    return `${sign}${numValue.toFixed(2)}%`;
 };
 
 /**
@@ -122,8 +146,13 @@ export const formatRelativeTime = (date) => {
  * @returns {string} Tailwind color class
  */
 export const getChangeColor = (value) => {
-    if (value > 0) return 'text-green-600';
-    if (value < 0) return 'text-red-600';
+    // Convert to number if string
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
+    
+    if (isNaN(numValue)) return 'text-gray-600';
+    
+    if (numValue > 0) return 'text-green-600';
+    if (numValue < 0) return 'text-red-600';
     return 'text-gray-600';
 };
 
@@ -133,7 +162,12 @@ export const getChangeColor = (value) => {
  * @returns {string} Arrow character
  */
 export const getChangeArrow = (value) => {
-    if (value > 0) return '↑';
-    if (value < 0) return '↓';
+    // Convert to number if string
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
+    
+    if (isNaN(numValue)) return '→';
+    
+    if (numValue > 0) return '↑';
+    if (numValue < 0) return '↓';
     return '→';
 };
